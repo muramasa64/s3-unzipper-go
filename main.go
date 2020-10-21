@@ -24,7 +24,7 @@ const (
 	tempUnzipPath    = tempArtifactPath + "unzipped/"
 	tempZip          = "temp.zip"
 	dirPerm          = 0777
-	region           = endpoints.ApNortheast1RegionID
+	region           = endpoints.UsWest2RegionID
 )
 
 var (
