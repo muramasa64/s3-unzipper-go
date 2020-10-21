@@ -15,7 +15,8 @@ import (
 
 const (
 	sampleFile = "sample.zip"
-	testFile = "testdata/" + sampleFile
+	// testFile = "testdata/" + sampleFile
+	testFile = sampleFile
 )
 
 var (
@@ -23,12 +24,12 @@ var (
 )
 
 func TestHandler(t *testing.T) {
-	events := events.s3Event{
+	events := events.S3Event{
 		Records: []events.S3EventRecord{
 			{
 				S3: events.S3Entity{
-					Bucket: evests.S3Bucket{Name: srcBucket},
-					Object: evests.S3Object{Key: sampleFile},
+					Bucket: events.S3Bucket{Name: srcBucket},
+					Object: events.S3Object{Key: sampleFile},
 				},
 			},
 		},
@@ -74,7 +75,7 @@ func setup() {
 	uploader := s3manager.NewUploader(sess)
 	_, err = uploader.Upload(&s3manager.UploadInput{
 		Bucket: aws.String(srcBucket),
-		Key: aws.String(samelpFile),
+		Key: aws.String(sampleFile),
 		Body: file,
 	})
 	if err != nil {
@@ -83,17 +84,17 @@ func setup() {
 }
 
 func teardown() {
-	sess := session.Must(session.NewSessnion(&aws.Config{
+	sess := session.Must(session.NewSession(&aws.Config{
 		Region: aws.String(region)}),
 	)
 	svc := s3.New(sess)
 
-	for _, b := rang []string{srcBucket, destBucket} {
+	for _, b := range []string{srcBucket, destBucket} {
 		iter := s3manager.NewDeleteListIterator(svc, &s3.ListObjectsInput{
 			Bucket: aws.String(b),
 		})
 
-		if err := s3manager.NewBuckxetDeleteWithClient(svc).Delete(aws.BackgroundContext(), iter); err != nil {
+		if err := s3manager.NewBatchDeleteWithClient(svc).Delete(aws.BackgroundContext(), iter); err != nil {
 			panic(err)
 		}
 
@@ -106,10 +107,10 @@ func teardown() {
 	}
 }
 
-func bucketExests(svc *s3.S3, bucket string) bool {
+func bucketExists(svc *s3.S3, bucket string) bool {
 	input := &s3.HeadBucketInput{Bucket: aws.String(bucket)}
 
-	_, err := svc.HeadBUcket(input)
+	_, err := svc.HeadBucket(input)
 	if err != nil {
 		return false
 	}
